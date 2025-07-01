@@ -1,0 +1,238 @@
+package com.binarybricks.iwt.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.binarybricks.iwt.ui.theme.IWTTheme
+
+@Composable
+fun WorkoutScreen(
+    currentTime: String = "02:45",
+    currentInterval: String = "Fast Walk",
+    stepCount: Int = 1234,
+    totalWorkoutTime: String = "10:45",
+    progress: Float = 0.6f,
+    isPaused: Boolean = false,
+    onPauseResume: () -> Unit = {},
+    onEndWorkout: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+    ) {
+        // Header Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFF5F5F5))
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+        ) {
+            // Back arrow on the left
+            Icon(
+                painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_0_2),
+                contentDescription = "Back",
+                tint = Color(0xFF333333),
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(24.dp)
+            )
+
+            // Centered title
+            Text(
+                text = "Workout",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF333333),
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        // Main Content
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            // Current interval and time at top
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = currentInterval,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF333333)
+                )
+                Text(
+                    text = currentTime,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF333333)
+                )
+            }
+
+            // Progress bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .height(8.dp)
+                    .background(Color(0xFFE0E0E0), RoundedCornerShape(4.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(progress)
+                        .background(Color(0xFF4CAF50), RoundedCornerShape(4.dp))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Central display with steps
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Steps icon and count
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_1_0),
+                        contentDescription = "Steps",
+                        tint = Color(0xFF333333),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stepCount.toString(),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF333333)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
+        // Bottom control buttons
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Pause button
+            Button(
+                onClick = onPauseResume,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = if (isPaused) "Resume" else "Pause",
+                    fontSize = 16.sp,
+                    color = Color(0xFF333333),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // End button
+            Button(
+                onClick = onEndWorkout,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "End",
+                    fontSize = 16.sp,
+                    color = Color(0xFF333333),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WorkoutScreenPreview() {
+    IWTTheme {
+        WorkoutScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WorkoutScreenFastWalkPreview() {
+    IWTTheme {
+        WorkoutScreen(
+            currentTime = "03:30",
+            currentInterval = "Fast Walk",
+            stepCount = 2567,
+            totalWorkoutTime = "15:30",
+            progress = 0.3f,
+            isPaused = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WorkoutScreenPausedPreview() {
+    IWTTheme {
+        WorkoutScreen(
+            currentTime = "02:15",
+            currentInterval = "Slow Walk",
+            stepCount = 1890,
+            totalWorkoutTime = "08:45",
+            progress = 0.8f,
+            isPaused = true
+        )
+    }
+}

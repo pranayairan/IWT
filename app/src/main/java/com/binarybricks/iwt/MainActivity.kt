@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreen
+import com.binarybricks.iwt.ui.screens.HomeScreen
 import com.binarybricks.iwt.ui.theme.IWTTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    WorkoutHistoryScreen()
+                    HomeScreen()
                 }
             }
         }
@@ -34,6 +34,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivityPreview() {
     IWTTheme {
-        WorkoutHistoryScreen()
+        HomeScreen()
     }
 }
