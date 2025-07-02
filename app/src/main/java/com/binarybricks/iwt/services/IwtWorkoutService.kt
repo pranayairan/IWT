@@ -4,25 +4,34 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.Parcelable
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.core.app.NotificationCompat
 import com.binarybricks.iwt.R
 import com.binarybricks.iwt.data.model.Interval
 import com.binarybricks.iwt.data.model.IntervalType
+import com.binarybricks.iwt.data.preferences.UserPreferencesRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import java.util.LinkedList
+import javax.inject.Inject
 
 // Data class to hold the live state of the workout
 data class WorkoutServiceState(
@@ -34,7 +43,12 @@ data class WorkoutServiceState(
     val isDone: Boolean = false
 )
 
+@AndroidEntryPoint
 class IwtWorkoutService : Service(), SensorEventListener {
+
+    // Inject the preferences repository
+    @Inject
+    lateinit var preferencesRepository: UserPreferencesRepository
 
     private val binder = LocalBinder()
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -138,10 +152,43 @@ class IwtWorkoutService : Service(), SensorEventListener {
                     updateNotification()
                     delay(1000)
                 }
+
+                // Signal the user when an interval ends
+                signalIntervalChange()
             }
             // Workout finished
             _serviceState.value = _serviceState.value.copy(isDone = true)
             stopWorkout()
+        }
+    }
+
+    private fun signalIntervalChange() {
+        serviceScope.launch {
+            if (preferencesRepository.soundCuesEnabled.first()) {
+                // Play a short tone
+                ToneGenerator(
+                    AudioManager.STREAM_NOTIFICATION,
+                    100
+                ).startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200)
+            }
+            if (preferencesRepository.vibrationCuesEnabled.first()) {
+                // Vibrate
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (vibrator.hasVibrator()) {
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(
+                            VibrationEffect.createOneShot(
+                                500,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(500)
+                    }
+                }
+            }
         }
     }
 

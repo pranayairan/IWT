@@ -17,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.binarybricks.iwt.ui.screens.SettingsScreen
+import com.binarybricks.iwt.ui.screens.settings.SettingsScreenRoute
 import com.binarybricks.iwt.ui.screens.history.WorkoutHistoryScreenRoute
 import com.binarybricks.iwt.ui.screens.workout.WorkoutScreenRoute
 import com.binarybricks.iwt.ui.screens.summary.WorkoutSummaryScreenRoute
@@ -50,7 +50,7 @@ fun AppNavHost(navController: NavHostController) {
             HomeScreen(navController = navController)
         }
         composable("settings") {
-            SettingsScreen(navController = navController)
+            SettingsScreenRoute(navController = navController)
         }
         composable("history") {
             WorkoutHistoryScreenRoute(navController = navController)

@@ -8,12 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.binarybricks.iwt.data.model.Interval
 import com.binarybricks.iwt.data.model.WorkoutLog
+import com.binarybricks.iwt.data.preferences.UserPreferencesRepository
 import com.binarybricks.iwt.data.repository.WorkoutRepository
 import com.binarybricks.iwt.services.IwtWorkoutService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -25,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository,
+    private val preferencesRepository: UserPreferencesRepository,
     private val application: Application,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -35,27 +38,29 @@ class WorkoutViewModel @Inject constructor(
     private val _navigationEvent = Channel<String>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
 
-    val uiState: StateFlow<WorkoutUiState> = IwtWorkoutService.serviceState
-        .map { serviceState ->
-            // Transform service state to UI state
-            WorkoutUiState(
-                currentTime = formatSeconds(serviceState.intervalTimeLeftSeconds),
-                currentIntervalType = serviceState.currentInterval?.type
-                    ?: com.binarybricks.iwt.data.model.IntervalType.WARM_UP,
-                currentIntervalName = serviceState.currentInterval?.type?.name?.replace("_", " ")
-                    ?.lowercase()?.capitalize() ?: "Warm Up",
-                stepCount = serviceState.steps,
-                totalWorkoutTime = formatSeconds(serviceState.totalTimeElapsedSeconds),
-                progress = calculateProgress(serviceState.totalTimeElapsedSeconds),
-                isPaused = serviceState.isPaused,
-                isFinished = serviceState.isDone
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = WorkoutUiState()
+    val uiState: StateFlow<WorkoutUiState> = combine(
+        IwtWorkoutService.serviceState,
+        preferencesRepository.keepScreenOnEnabled
+    ) { serviceState, keepScreenOn ->
+        // Transform service state to UI state
+        WorkoutUiState(
+            currentTime = formatSeconds(serviceState.intervalTimeLeftSeconds),
+            currentIntervalType = serviceState.currentInterval?.type
+                ?: com.binarybricks.iwt.data.model.IntervalType.WARM_UP,
+            currentIntervalName = serviceState.currentInterval?.type?.name?.replace("_", " ")
+                ?.lowercase()?.capitalize() ?: "Warm Up",
+            stepCount = serviceState.steps,
+            totalWorkoutTime = formatSeconds(serviceState.totalTimeElapsedSeconds),
+            progress = calculateProgress(serviceState.totalTimeElapsedSeconds),
+            isPaused = serviceState.isPaused,
+            isFinished = serviceState.isDone,
+            keepScreenOnEnabled = keepScreenOn
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = WorkoutUiState()
+    )
 
     init {
         startWorkoutService()

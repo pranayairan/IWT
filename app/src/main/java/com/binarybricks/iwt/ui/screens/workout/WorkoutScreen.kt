@@ -46,8 +46,10 @@ fun WorkoutScreenRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Keep screen on during workout
-    KeepScreenOn()
+    // Keep screen on during workout only if enabled in settings
+    if (uiState.keepScreenOnEnabled) {
+        KeepScreenOn()
+    }
 
     // Listen for navigation events from the ViewModel
     LaunchedEffect(Unit) {
