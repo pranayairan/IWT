@@ -18,8 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.binarybricks.iwt.ui.screens.SettingsScreen
-import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreen
-import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreenRoute
+import com.binarybricks.iwt.ui.screens.history.WorkoutHistoryScreenRoute
 import com.binarybricks.iwt.ui.screens.workout.WorkoutScreenRoute
 import com.binarybricks.iwt.ui.screens.summary.WorkoutSummaryScreenRoute
 import com.binarybricks.iwt.ui.theme.IWTTheme
