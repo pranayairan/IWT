@@ -15,11 +15,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 
 @Composable
 fun SettingsScreen(
-    onBackClick: () -> Unit = {}
+    navController: NavController,
+    onBackClick: () -> Unit = { navController.popBackStack() }
 ) {
     var soundCuesEnabled by remember { mutableStateOf(false) }
     var vibrationCuesEnabled by remember { mutableStateOf(false) }
@@ -222,6 +225,8 @@ fun SettingItemWithValue(
 @Composable
 fun SettingsScreenPreview() {
     IWTTheme {
-        SettingsScreen()
+        PreviewWithNavController {
+            SettingsScreen(navController = it)
+        }
     }
 }

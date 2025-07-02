@@ -1,5 +1,6 @@
 package com.binarybricks.iwt
 
+import HomeScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +11,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.binarybricks.iwt.ui.screens.HomeScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.binarybricks.iwt.ui.screens.SettingsScreen
+import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreen
+import com.binarybricks.iwt.ui.screens.WorkoutScreen
+import com.binarybricks.iwt.ui.screens.WorkoutSummaryScreen
 import com.binarybricks.iwt.ui.theme.IWTTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,9 +33,49 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    val navController = rememberNavController()
+                    AppNavHost(navController = navController)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AppNavHost(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            HomeScreen(navController = navController)
+        }
+        composable("settings") {
+            SettingsScreen(navController = navController)
+        }
+        composable("history") {
+            WorkoutHistoryScreen(navController = navController)
+        }
+        composable(
+            route = "workout/{presetId}",
+            arguments = listOf(
+                navArgument("presetId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val presetId = backStackEntry.arguments?.getString("presetId") ?: ""
+            WorkoutScreen(
+                navController = navController,
+                presetId = presetId
+            )
+        }
+        composable(
+            route = "workout_summary/{workoutId}",
+            arguments = listOf(
+                navArgument("workoutId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val workoutId = backStackEntry.arguments?.getString("workoutId") ?: ""
+            WorkoutSummaryScreen(
+                navController = navController,
+                workoutId = workoutId
+            )
         }
     }
 }
@@ -34,6 +84,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivityPreview() {
     IWTTheme {
-        HomeScreen()
+        val navController = rememberNavController()
+        AppNavHost(navController = navController)
     }
 }

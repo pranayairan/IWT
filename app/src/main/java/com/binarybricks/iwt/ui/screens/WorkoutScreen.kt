@@ -27,10 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 
 @Composable
 fun WorkoutScreen(
+    navController: NavController,
+    presetId: String,
     currentTime: String = "02:45",
     currentInterval: String = "Fast Walk",
     stepCount: Int = 1234,
@@ -202,37 +206,47 @@ fun WorkoutScreen(
 @Preview(showBackground = true)
 @Composable
 fun WorkoutScreenPreview() {
-    IWTTheme {
-        WorkoutScreen()
+    PreviewWithNavController {
+        IWTTheme {
+            WorkoutScreen(navController = it, presetId = "")
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WorkoutScreenFastWalkPreview() {
-    IWTTheme {
-        WorkoutScreen(
-            currentTime = "03:30",
-            currentInterval = "Fast Walk",
-            stepCount = 2567,
-            totalWorkoutTime = "15:30",
-            progress = 0.3f,
-            isPaused = false
-        )
+    PreviewWithNavController {
+        IWTTheme {
+            WorkoutScreen(
+                navController = it,
+                presetId = "",
+                currentTime = "03:30",
+                currentInterval = "Fast Walk",
+                stepCount = 2567,
+                totalWorkoutTime = "15:30",
+                progress = 0.3f,
+                isPaused = false
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WorkoutScreenPausedPreview() {
-    IWTTheme {
-        WorkoutScreen(
-            currentTime = "02:15",
-            currentInterval = "Slow Walk",
-            stepCount = 1890,
-            totalWorkoutTime = "08:45",
-            progress = 0.8f,
-            isPaused = true
-        )
+    PreviewWithNavController {
+        IWTTheme {
+            WorkoutScreen(
+                navController = it,
+                presetId = "",
+                currentTime = "02:15",
+                currentInterval = "Slow Walk",
+                stepCount = 1890,
+                totalWorkoutTime = "08:45",
+                progress = 0.8f,
+                isPaused = true
+            )
+        }
     }
 }

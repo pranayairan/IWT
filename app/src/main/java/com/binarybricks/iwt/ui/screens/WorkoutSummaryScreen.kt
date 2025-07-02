@@ -27,10 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 
 @Composable
 fun WorkoutSummaryScreen(
+    navController: NavController,
+    workoutId: String,
     totalDuration: String = "30:00 minutes",
     totalSteps: String = "3,210 steps",
     fastWalkTime: String = "15:00 minutes",
@@ -134,7 +138,7 @@ fun WorkoutSummaryScreen(
                             color = Color(0xFF4CAF50)
                         )
                         Text(
-                            text = "30:00\nminutes",
+                            text = totalDuration,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF0D1C0D)
@@ -153,7 +157,7 @@ fun WorkoutSummaryScreen(
                             color = Color(0xFF4CAF50)
                         )
                         Text(
-                            text = "3,210 steps",
+                            text = totalSteps,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF0D1C0D)
@@ -178,7 +182,7 @@ fun WorkoutSummaryScreen(
                             color = Color(0xFF4CAF50)
                         )
                         Text(
-                            text = "15:00\nminutes",
+                            text = fastWalkTime,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF0D1C0D)
@@ -197,7 +201,7 @@ fun WorkoutSummaryScreen(
                             color = Color(0xFF4CAF50)
                         )
                         Text(
-                            text = "15:00 minutes",
+                            text = slowWalkTime,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF0D1C0D)
@@ -239,20 +243,26 @@ fun WorkoutSummaryScreen(
 @Preview(showBackground = true)
 @Composable
 fun WorkoutSummaryScreenPreview() {
-    IWTTheme {
-        WorkoutSummaryScreen()
+    PreviewWithNavController {
+        IWTTheme {
+            WorkoutSummaryScreen(navController = it, workoutId = "")
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WorkoutSummaryScreenCustomPreview() {
-    IWTTheme {
-        WorkoutSummaryScreen(
-            totalDuration = "25:15 minutes",
-            totalSteps = "2,845 steps",
-            fastWalkTime = "12:30 minutes",
-            slowWalkTime = "12:45 minutes"
-        )
+    PreviewWithNavController {
+        IWTTheme {
+            WorkoutSummaryScreen(
+                navController = it,
+                workoutId = "",
+                totalDuration = "25:15 minutes",
+                totalSteps = "2,845 steps",
+                fastWalkTime = "12:30 minutes",
+                slowWalkTime = "12:45 minutes"
+            )
+        }
     }
 }

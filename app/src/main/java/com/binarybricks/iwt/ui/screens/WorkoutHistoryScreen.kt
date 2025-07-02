@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.binarybricks.iwt.R
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import androidx.navigation.NavController
+import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 
 data class WorkoutHistoryItem(
     val date: String,
@@ -28,7 +30,7 @@ data class WorkoutHistoryItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkoutHistoryScreen() {
+fun WorkoutHistoryScreen(navController: NavController) {
     val historyItems = listOf(
         WorkoutHistoryItem("June 28, 2025", "Total Duration: 30 minutes", "Total Steps: 5000"),
         WorkoutHistoryItem("June 27, 2025", "Total Duration: 45 minutes", "Total Steps: 7500"),
@@ -59,7 +61,7 @@ fun WorkoutHistoryScreen() {
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* TODO: Handle back navigation */ }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
@@ -130,7 +132,9 @@ fun WorkoutHistoryCard(item: WorkoutHistoryItem) {
 @Composable
 fun WorkoutHistoryScreenPreview() {
     IWTTheme {
-        WorkoutHistoryScreen()
+        PreviewWithNavController {
+            WorkoutHistoryScreen(it)
+        }
     }
 }
 

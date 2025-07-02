@@ -1,5 +1,6 @@
-package com.binarybricks.iwt.ui.screens
-
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,22 +9,72 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.Navigator
 import com.binarybricks.iwt.R
+import com.binarybricks.iwt.data.model.WorkoutLog
+import com.binarybricks.iwt.di.AppViewModelProvider
+import com.binarybricks.iwt.ui.screens.home.HomeViewModel
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import com.binarybricks.iwt.ui.preview.PreviewWithNavController
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    // Permission handling
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            viewModel.onPermissionResult(isGranted)
+            if (isGranted && uiState.selectedPresetId != null) {
+                navController.navigate("workout/${uiState.selectedPresetId}")
+            }
+        }
+    )
+
+    // Check initial permission status
+    LaunchedEffect(Unit) {
+        val isGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true // No runtime permission needed before Android Q
+        }
+        viewModel.onPermissionResult(isGranted)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,6 +95,7 @@ fun HomeScreen() {
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .size(24.dp)
+                    .clickable { navController.navigate("settings") }
             )
 
             // Centered title with icon
@@ -95,35 +147,25 @@ fun HomeScreen() {
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Beginner card
-                WorkoutLevelCard(
-                    icon = R.drawable.walking_man_sideview,
-                    title = "Beginner",
-                    duration = "20 min",
-                    backgroundColor = Color(0xFFE8D7C5),
-                    isSelected = false,
-                    modifier = Modifier.width(150.dp)
-                )
+                // Use the presets from the ViewModel
+                uiState.presets.forEachIndexed { index, preset ->
+                    val isFullyVisible = index < 2
+                    val isSelected = preset.id == uiState.selectedPresetId
 
-                // Intermediate card
-                WorkoutLevelCard(
-                    icon = R.drawable.walking_man_sideview_0,
-                    title = "Intermediate",
-                    duration = "30 min",
-                    backgroundColor = Color(0xFFE8D7C5),
-                    isSelected = false,
-                    modifier = Modifier.width(150.dp)
-                )
-
-                // Advanced card (partially visible)
-                WorkoutLevelCard(
-                    icon = R.drawable.walking_man_side_view,
-                    title = "Advanced",
-                    duration = "45 min",
-                    backgroundColor = Color(0xFFE8D7C5),
-                    isSelected = false,
-                    modifier = Modifier.width(75.dp)
-                )
+                    WorkoutLevelCard(
+                        icon = when (index) {
+                            0 -> R.drawable.walking_man_sideview
+                            1 -> R.drawable.walking_man_sideview_0
+                            else -> R.drawable.walking_man_side_view
+                        },
+                        title = preset.name,
+                        duration = "${preset.totalDurationMinutes} min",
+                        backgroundColor = Color(0xFFE8D7C5),
+                        isSelected = isSelected,
+                        modifier = Modifier.width(if (isFullyVisible) 150.dp else 75.dp),
+                        onClick = { viewModel.onPresetSelected(preset.id) }
+                    )
+                }
             }
 
             // Start button
@@ -134,12 +176,27 @@ fun HomeScreen() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { /* Handle start action */ },
+                    onClick = {
+                        if (uiState.isActivityPermissionGranted) {
+                            uiState.selectedPresetId?.let { presetId ->
+                                navController.navigate("workout/$presetId")
+                            }
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
+                        } else {
+                            // On older Android, permission is not needed at runtime
+                            uiState.selectedPresetId?.let { presetId ->
+                                navController.navigate("workout/$presetId")
+                            }
+                        }
+                    },
+                    enabled = uiState.selectedPresetId != null,
                     modifier = Modifier
                         .width(200.dp)
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00C853)
+                        containerColor = Color(0xFF00C853),
+                        disabledContainerColor = Color(0xFFCCCCCC)
                     ),
                     shape = RoundedCornerShape(28.dp)
                 ) {
@@ -166,7 +223,7 @@ fun HomeScreen() {
         ) {
             // View Workout History button
             TextButton(
-                onClick = { /* Handle statistics action */ },
+                onClick = { navController.navigate("history") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -205,8 +262,17 @@ fun HomeScreen() {
                         )
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
+                    val lastWorkoutText = if (uiState.lastWorkout != null) {
+                        val steps = uiState.lastWorkout!!.totalSteps
+                        val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+                        val date = dateFormat.format(uiState.lastWorkout!!.date)
+                        "Last Workout ($date): $steps steps"
+                    } else {
+                        "No previous workouts"
+                    }
+
                     Text(
-                        text = "Last Workout: 2,500 steps",
+                        text = lastWorkoutText,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White
@@ -232,7 +298,8 @@ fun WorkoutLevelCard(
     duration: String,
     backgroundColor: Color,
     isSelected: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     val cardBackgroundColor = if (isSelected) Color(0xFF00C853) else Color(0xFFE8D7C5)
     val textColor = if (isSelected) Color.White else Color(0xFF0D1C0D)
@@ -240,7 +307,8 @@ fun WorkoutLevelCard(
 
     Card(
         modifier = modifier
-            .height(180.dp),
+            .height(180.dp)
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = cardBackgroundColor
         ),
@@ -292,6 +360,10 @@ fun WorkoutLevelCard(
 @Composable
 fun HomeScreenPreview() {
     IWTTheme {
-        HomeScreen()
+        PreviewWithNavController { navController ->
+            HomeScreen(
+                navController = navController
+            )
+        }
     }
 }
