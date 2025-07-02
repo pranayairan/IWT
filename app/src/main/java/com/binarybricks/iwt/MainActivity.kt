@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.binarybricks.iwt.ui.screens.SettingsScreen
 import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreen
+import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreenRoute
 import com.binarybricks.iwt.ui.screens.workout.WorkoutScreenRoute
 import com.binarybricks.iwt.ui.screens.summary.WorkoutSummaryScreenRoute
 import com.binarybricks.iwt.ui.theme.IWTTheme
@@ -53,7 +54,7 @@ fun AppNavHost(navController: NavHostController) {
             SettingsScreen(navController = navController)
         }
         composable("history") {
-            WorkoutHistoryScreen(navController = navController)
+            WorkoutHistoryScreenRoute(navController = navController)
         }
         composable(
             route = "workout/{presetId}",
