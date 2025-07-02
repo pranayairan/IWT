@@ -19,6 +19,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,9 +29,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.binarybricks.iwt.ui.theme.IWTTheme
 import com.binarybricks.iwt.ui.preview.PreviewWithNavController
+import com.binarybricks.iwt.ui.screens.summary.WorkoutSummaryViewModel
+import com.binarybricks.iwt.ui.theme.IWTTheme
+
+@Composable
+fun WorkoutSummaryScreenRoute(
+    navController: NavController,
+    workoutId: String,
+    viewModel: WorkoutSummaryViewModel = hiltViewModel()
+) {
+    val uiState = viewModel.uiState.collectAsState()
+
+    fun onDoneClicked() {
+        navController.navigate("home") {
+            popUpTo("home") {
+                inclusive = true
+            }
+        }
+    }
+
+    // You can add a loading indicator here if uiState.isLoading is true
+    if (!uiState.value.isLoading) {
+        WorkoutSummaryScreen(
+            navController = navController,
+            workoutId = workoutId,
+            totalDuration = uiState.value.totalDuration,
+            totalSteps = uiState.value.totalSteps,
+            fastWalkTime = uiState.value.fastWalkTime,
+            slowWalkTime = uiState.value.slowWalkTime,
+            onDone = ::onDoneClicked
+        )
+    }
+}
 
 @Composable
 fun WorkoutSummaryScreen(
@@ -245,7 +279,7 @@ fun WorkoutSummaryScreen(
 fun WorkoutSummaryScreenPreview() {
     PreviewWithNavController {
         IWTTheme {
-            WorkoutSummaryScreen(navController = it, workoutId = "")
+            WorkoutSummaryScreenRoute(navController = it, workoutId = "")
         }
     }
 }
@@ -255,13 +289,9 @@ fun WorkoutSummaryScreenPreview() {
 fun WorkoutSummaryScreenCustomPreview() {
     PreviewWithNavController {
         IWTTheme {
-            WorkoutSummaryScreen(
+            WorkoutSummaryScreenRoute(
                 navController = it,
                 workoutId = "",
-                totalDuration = "25:15 minutes",
-                totalSteps = "2,845 steps",
-                fastWalkTime = "12:30 minutes",
-                slowWalkTime = "12:45 minutes"
             )
         }
     }

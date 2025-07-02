@@ -21,6 +21,7 @@ import com.binarybricks.iwt.ui.screens.SettingsScreen
 import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreen
 import com.binarybricks.iwt.ui.screens.workout.WorkoutScreenRoute
 import com.binarybricks.iwt.ui.screens.WorkoutSummaryScreen
+import com.binarybricks.iwt.ui.screens.WorkoutSummaryScreenRoute
 import com.binarybricks.iwt.ui.theme.IWTTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -74,7 +75,7 @@ fun AppNavHost(navController: NavHostController) {
             )
         ) { backStackEntry ->
             val workoutId = backStackEntry.arguments?.getString("workoutId") ?: ""
-            WorkoutSummaryScreen(
+            WorkoutSummaryScreenRoute(
                 navController = navController,
                 workoutId = workoutId
             )

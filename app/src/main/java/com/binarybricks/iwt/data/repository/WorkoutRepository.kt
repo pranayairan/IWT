@@ -4,6 +4,7 @@ import com.binarybricks.iwt.data.model.Interval
 import com.binarybricks.iwt.data.model.IntervalType
 import com.binarybricks.iwt.data.model.WorkoutPreset
 import com.binarybricks.iwt.data.model.WorkoutLog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.util.Date
@@ -13,10 +14,30 @@ import javax.inject.Singleton
 interface WorkoutRepository {
     fun getWorkoutPresets(): List<WorkoutPreset>
     fun getLatestWorkoutLog(): Flow<WorkoutLog?>
+    suspend fun getWorkoutLogById(id: String): WorkoutLog? // This can be null if not found
 }
 
 @Singleton
 class FakeWorkoutRepository @Inject constructor() : WorkoutRepository {
+
+    // A fake list of logs to search through
+    private val fakeLogs = listOf(
+        WorkoutLog(
+            id = "dummy_workout_123",
+            date = Date(),
+            totalDurationSeconds = 1800, // 30 minutes
+            totalSteps = 3210,
+            presetName = "Intermediate"
+        ),
+        WorkoutLog(
+            id = "new",
+            date = Date(),
+            totalDurationSeconds = 1500, // 25 minutes
+            totalSteps = 2845,
+            presetName = "Beginner"
+        )
+    )
+
     override fun getWorkoutPresets(): List<WorkoutPreset> {
         return listOf(
             WorkoutPreset(
@@ -99,19 +120,14 @@ class FakeWorkoutRepository @Inject constructor() : WorkoutRepository {
     }
 
     override fun getLatestWorkoutLog(): Flow<WorkoutLog?> {
-        // For now, return null to simulate no workout history
-        // In a real implementation, this would be fetched from a database
-        return flowOf(null)
+        // Return the first workout log from our fake logs
+        return flowOf(fakeLogs.firstOrNull())
+    }
 
-        // Example of returning mock data:
-        // return flowOf(
-        //     WorkoutLog(
-        //         id = "workout_123",
-        //         date = Date(),
-        //         totalDurationSeconds = 1200, // 20 minutes
-        //         totalSteps = 2500,
-        //         presetName = "Beginner"
-        //     )
-        // )
+    // Implement the new method
+    override suspend fun getWorkoutLogById(id: String): WorkoutLog? {
+        // In a real app, this would be a Room DB query.
+        delay(150) // Simulate network/db delay
+        return fakeLogs.find { it.id == id }
     }
 }
