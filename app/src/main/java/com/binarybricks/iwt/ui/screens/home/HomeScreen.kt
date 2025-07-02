@@ -254,6 +254,14 @@ fun HomeScreen(
                             RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .clickable(
+                            enabled = uiState.lastWorkout != null,
+                            onClick = {
+                                uiState.lastWorkout?.let { workout ->
+                                    navController.navigate("workout_summary/${workout.id}")
+                                }
+                            }
+                        )
                 ) {
                     val lastWorkoutText = if (uiState.lastWorkout != null) {
                         val steps = uiState.lastWorkout!!.totalSteps

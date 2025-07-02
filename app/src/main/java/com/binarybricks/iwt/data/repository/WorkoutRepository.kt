@@ -14,14 +14,15 @@ import javax.inject.Singleton
 interface WorkoutRepository {
     fun getWorkoutPresets(): List<WorkoutPreset>
     fun getLatestWorkoutLog(): Flow<WorkoutLog?>
-    suspend fun getWorkoutLogById(id: String): WorkoutLog? // This can be null if not found
+    suspend fun getWorkoutLogById(id: String): WorkoutLog?
+    suspend fun saveWorkoutLog(log: WorkoutLog): String // Returns the ID of the new log
 }
 
 @Singleton
 class FakeWorkoutRepository @Inject constructor() : WorkoutRepository {
 
     // A fake list of logs to search through
-    private val fakeLogs = listOf(
+    private val fakeLogs = mutableListOf(
         WorkoutLog(
             id = "dummy_workout_123",
             date = Date(),
@@ -129,5 +130,15 @@ class FakeWorkoutRepository @Inject constructor() : WorkoutRepository {
         // In a real app, this would be a Room DB query.
         delay(150) // Simulate network/db delay
         return fakeLogs.find { it.id == id }
+    }
+
+    override suspend fun saveWorkoutLog(log: WorkoutLog): String {
+        // In a real app, this would insert into Room and return the new row's ID.
+        // For the fake repo, we'll just add it to our list.
+        val newId = "new_workout_${System.currentTimeMillis()}"
+        val newLog = log.copy(id = newId)
+        fakeLogs.add(0, newLog) // Add to the start of the list so it appears as the latest
+        delay(100) // Simulate network/db delay
+        return newId
     }
 }

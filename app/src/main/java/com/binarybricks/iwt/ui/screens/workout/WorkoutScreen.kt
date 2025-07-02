@@ -49,11 +49,11 @@ fun WorkoutScreenRoute(
     // Keep screen on during workout
     KeepScreenOn()
 
-    // Navigate away when the workout is finished
-    LaunchedEffect(uiState.isFinished) {
-        if (uiState.isFinished) {
-            // Navigate to summary screen, passing results
-            navController.navigate("workout_summary/new") {
+    // Listen for navigation events from the ViewModel
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { newLogId ->
+            navController.navigate("workout_summary/$newLogId") {
+                // Pop up to the home screen to clear the workout from the back stack
                 popUpTo("home")
             }
         }
