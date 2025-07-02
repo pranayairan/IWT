@@ -1,12 +1,15 @@
 package com.binarybricks.iwt.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Date
 
 // Represents a single interval within a workout
+@Parcelize
 data class Interval(
     val type: IntervalType,
     val durationSeconds: Int
-)
+) : Parcelable
 
 enum class IntervalType {
     WARM_UP,

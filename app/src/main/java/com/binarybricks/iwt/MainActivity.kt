@@ -19,10 +19,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.binarybricks.iwt.ui.screens.SettingsScreen
 import com.binarybricks.iwt.ui.screens.WorkoutHistoryScreen
-import com.binarybricks.iwt.ui.screens.WorkoutScreen
+import com.binarybricks.iwt.ui.screens.workout.WorkoutScreenRoute
 import com.binarybricks.iwt.ui.screens.WorkoutSummaryScreen
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +62,7 @@ fun AppNavHost(navController: NavHostController) {
             )
         ) { backStackEntry ->
             val presetId = backStackEntry.arguments?.getString("presetId") ?: ""
-            WorkoutScreen(
+            WorkoutScreenRoute(
                 navController = navController,
                 presetId = presetId
             )
