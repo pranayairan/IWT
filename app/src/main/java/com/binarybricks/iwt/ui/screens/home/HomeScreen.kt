@@ -88,7 +88,9 @@ fun HomeScreen(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .size(24.dp)
-                    .clickable { navController.navigate("settings") }
+                    .clickable {
+                        navController.navigate("settings")
+                    }
             )
 
             // Centered title with icon
