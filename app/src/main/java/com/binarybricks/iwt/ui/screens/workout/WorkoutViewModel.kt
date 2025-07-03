@@ -54,7 +54,8 @@ class WorkoutViewModel @Inject constructor(
             progress = calculateProgress(serviceState.totalTimeElapsedSeconds),
             isPaused = serviceState.isPaused,
             isFinished = serviceState.isDone,
-            keepScreenOnEnabled = keepScreenOn
+            keepScreenOnEnabled = keepScreenOn,
+            totalDurationMinutes = getPresetDuration()
         )
     }.stateIn(
         scope = viewModelScope,
@@ -125,6 +126,11 @@ class WorkoutViewModel @Inject constructor(
         val preset = workoutRepository.getWorkoutPresets().find { it.id == presetId }
         val totalDuration = preset?.totalDurationMinutes?.times(60) ?: 1
         return (elapsedSeconds.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f)
+    }
+
+    private fun getPresetDuration(): Int {
+        return workoutRepository.getWorkoutPresets()
+            .find { it.id == presetId }?.totalDurationMinutes ?: 0
     }
 
     private fun formatSeconds(seconds: Int): String {

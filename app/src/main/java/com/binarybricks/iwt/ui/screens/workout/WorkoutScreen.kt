@@ -17,13 +17,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,7 +41,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 import com.binarybricks.iwt.ui.theme.IWTTheme
-import androidx.compose.material3.ExperimentalMaterial3Api
 
 @Composable
 fun WorkoutScreenRoute(
@@ -77,6 +75,7 @@ fun WorkoutScreenRoute(
         totalWorkoutTime = uiState.totalWorkoutTime,
         progress = uiState.progress,
         isPaused = uiState.isPaused,
+        totalDuration = uiState.totalDurationMinutes,
         onPauseResume = viewModel::onPauseResume,
         onEndWorkout = viewModel::onEndWorkout
     )
@@ -105,13 +104,29 @@ fun WorkoutScreen(
     totalWorkoutTime: String = "10:45",
     progress: Float = 0.6f,
     isPaused: Boolean = false,
+    totalDuration: Int = 20,
     onPauseResume: () -> Unit = {},
     onEndWorkout: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Workout") },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Workout")
+                        Text(
+                            text = "$totalDuration min",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF666666),
+                            modifier = Modifier.padding(end = 16.dp)
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -182,10 +197,10 @@ fun WorkoutScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_1_0),
+                        tint = Color(0xFF4CAF50),
+                        painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_1),
                         contentDescription = "Steps",
-                        tint = Color(0xFF333333),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(

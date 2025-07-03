@@ -11,5 +11,6 @@ data class WorkoutUiState(
     val progress: Float = 0f,
     val isPaused: Boolean = false,
     val isFinished: Boolean = false,
-    val keepScreenOnEnabled: Boolean = true
+    val keepScreenOnEnabled: Boolean = true,
+    val totalDurationMinutes: Int = 0
 )
