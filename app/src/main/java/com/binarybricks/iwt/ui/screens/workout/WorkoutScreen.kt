@@ -18,7 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 import com.binarybricks.iwt.ui.theme.IWTTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 @Composable
 fun WorkoutScreenRoute(
@@ -89,6 +95,7 @@ fun KeepScreenOn() {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun WorkoutScreen(
     navController: NavController,
     presetId: String,
@@ -101,43 +108,26 @@ fun WorkoutScreen(
     onPauseResume: () -> Unit = {},
     onEndWorkout: () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
-    ) {
-        // Header Section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFF5F5F5))
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-        ) {
-            // Back arrow on the left
-            Icon(
-                painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_0_2),
-                contentDescription = "Back",
-                tint = Color(0xFF333333),
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(24.dp)
-            )
-
-            // Centered title
-            Text(
-                text = "Workout",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF333333),
-                modifier = Modifier.align(Alignment.Center)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Workout") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_0_2),
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
         }
-
+    ) { paddingValues ->
         // Main Content
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             // Current interval and time at top
             Row(
@@ -208,53 +198,53 @@ fun WorkoutScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
-        }
 
-        // Bottom control buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Pause button
-            Button(
-                onClick = onPauseResume,
+            // Bottom control buttons
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE0E0E0)
-                ),
-                shape = RoundedCornerShape(8.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = if (isPaused) "Resume" else "Pause",
-                    fontSize = 16.sp,
-                    color = Color(0xFF333333),
-                    fontWeight = FontWeight.Medium
-                )
-            }
+                // Pause button
+                Button(
+                    onClick = onPauseResume,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE0E0E0)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = if (isPaused) "Resume" else "Pause",
+                        fontSize = 16.sp,
+                        color = Color(0xFF333333),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
 
-            Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-            // End button
-            Button(
-                onClick = onEndWorkout,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE0E0E0)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = "End",
-                    fontSize = 16.sp,
-                    color = Color(0xFF333333),
-                    fontWeight = FontWeight.Medium
-                )
+                // End button
+                Button(
+                    onClick = onEndWorkout,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE0E0E0)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "End",
+                        fontSize = 16.sp,
+                        color = Color(0xFF333333),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }

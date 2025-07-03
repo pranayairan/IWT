@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -62,6 +66,7 @@ fun WorkoutSummaryScreenRoute(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSummaryScreen(
     navController: NavController,
@@ -72,43 +77,27 @@ fun WorkoutSummaryScreen(
     slowWalkTime: String = "15:00 minutes",
     onDone: () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8FAF8))
-    ) {
-        // Header Section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFF8FAF8))
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-        ) {
-            // Back arrow on the left
-            Icon(
-                painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_icon),
-                contentDescription = "Back",
-                tint = Color(0xFF0D1C0D),
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(24.dp)
-            )
-
-            // Centered title
-            Text(
-                text = "Workout Summary",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D1C0D),
-                modifier = Modifier.align(Alignment.Center)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Workout Summary") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = com.binarybricks.iwt.R.drawable.vector_icon),
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
         }
-
+    ) { paddingValues ->
         // Main content
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color(0xFFF8FAF8))
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -242,30 +231,30 @@ fun WorkoutSummaryScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
-        }
 
-        // Done button at bottom
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            Button(
-                onClick = onDone,
+            // Done button at bottom
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
-                ),
-                shape = RoundedCornerShape(24.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Text(
-                    text = "Done",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Medium
-                )
+                Button(
+                    onClick = onDone,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50)
+                    ),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Text(
+                        text = "Done",
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
