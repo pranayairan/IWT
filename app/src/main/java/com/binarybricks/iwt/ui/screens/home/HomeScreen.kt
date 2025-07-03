@@ -47,10 +47,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.binarybricks.iwt.R
-import com.binarybricks.iwt.di.AppViewModelProvider
 import com.binarybricks.iwt.ui.preview.PreviewWithNavController
 import com.binarybricks.iwt.ui.screens.home.HomeViewModel
 import com.binarybricks.iwt.ui.theme.IWTTheme
@@ -61,7 +60,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current

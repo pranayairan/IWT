@@ -1,17 +1,18 @@
 package com.binarybricks.iwt.ui.screens.home
 
-import com.binarybricks.iwt.ui.screens.home.HomeUiState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.binarybricks.iwt.data.repository.WorkoutRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-// Note: We'll use Hilt after fixing dependencies
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
 
